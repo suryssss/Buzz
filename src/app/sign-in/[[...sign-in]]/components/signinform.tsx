@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import DotGrid from "@/components/animations/dots";
 import SplitText from "@/components/animations/logotext";
+import LoadingScreen from "@/components/animations/LoadingScreen"
+
 
 export default function SignInPage() {
   const { signIn, isLoaded, setActive } = useSignIn();
@@ -27,6 +29,8 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [isReady, setIsReady] = useState(false);
+  const [redirecting, setRedirecting] = useState(false)
+
 
   const handleAnimationComplete = () => {
     console.log('Buzz text animation completed!');
@@ -93,8 +97,12 @@ export default function SignInPage() {
 
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
-        router.push("/");
-      } else {
+        setRedirecting(true);
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      }
+      else {
         setError("Invalid credentials.");
       }
     } catch (err: unknown) {
@@ -108,6 +116,10 @@ export default function SignInPage() {
       setIsLoading(false);
     }
   };
+  if (redirecting) {
+    return <LoadingScreen />
+  }
+  
 
   const goBack = () => {
     setStep(1);

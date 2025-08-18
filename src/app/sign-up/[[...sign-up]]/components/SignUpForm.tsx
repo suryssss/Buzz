@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSignUp } from "@clerk/nextjs";
 import { motion } from "framer-motion";
+
 import {
   Card,
   CardHeader,
@@ -16,6 +17,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import DotGrid from "@/components/animations/dots";
 import SplitText from "@/components/animations/logotext";
+import LoadingScreen from "@/components/animations/LoadingScreen"
+
+
 
 export default function SignUpForm() {
   const { signUp, isLoaded, setActive } = useSignUp();
@@ -27,10 +31,9 @@ export default function SignUpForm() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showVerification, setShowVerification] = useState(false);
+  const [redirecting, setRedirecting] = useState(false)
 
-  const handleAnimationComplete = () => {
-    console.log('Buzz text animation completed!');
-  };
+
 
   // Memoize the Buzz title to prevent re-rendering
   const buzzTitle = useMemo(() => (
@@ -46,10 +49,12 @@ export default function SignUpForm() {
       threshold={0.1}
       rootMargin="-50px"
       textAlign="center"
-      onLetterAnimationComplete={handleAnimationComplete}
     />
   ), []);
 
+  if (redirecting) {
+    return <LoadingScreen />
+  }
   if (!isLoaded) {
     console.log("Clerk signUp object not loaded yet");
     return null;
@@ -112,10 +117,14 @@ export default function SignUpForm() {
       });
 
       if (result.status === "complete") {
-        console.log("Verification complete, redirecting...");
-        await setActive({ session: result.createdSessionId });
-        router.push("/");
-      } else {
+        console.log("Verification complete, showing loading screen...")
+        await setActive({ session: result.createdSessionId })
+        setRedirecting(true)
+        setTimeout(() => {
+          router.push("/")
+        }, 2000)
+      }
+      else {
         setError("Invalid verification code. Please try again.");
       }
     } catch (err: unknown) {
@@ -371,7 +380,7 @@ export default function SignUpForm() {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 1 }}
             >
-              © 2025 MyChatApp. All rights reserved.
+              © 2025 Buzz. All rights reserved.
             </motion.p>
           </CardFooter>
         </Card>
