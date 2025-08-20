@@ -6,9 +6,13 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useNavigation } from '@/hooks/useNavigation'
-
+import { useConversation } from '@/hooks/useConversation'
+import { ModeToggle } from '@/components/ui/theme/theme-toggle'
 const MobileNavBar = () => {
   const paths = useNavigation()
+  const {isActive}=useConversation()
+
+  if (isActive) return null;
 
   return (
     <Card className='fixed bottom-4 w-[calc(100vw-32px)] flex items-center h-16 p-2 lg:hidden'>
@@ -33,6 +37,7 @@ const MobileNavBar = () => {
               </Tooltip>
             </li>
           ))}
+          <li><ModeToggle/></li>
         <li>
         <UserButton />
       </li>
