@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { useNavigation } from '@/hooks/useNavigation'
+import { ModeToggle } from '@/components/ui/theme/theme-toggle'
 
 const NavBar = () => {
   const paths = useNavigation()
@@ -37,6 +38,7 @@ const NavBar = () => {
       </nav>
 
       <div className='flex flex-col items-center gap-4'>
+        <ModeToggle/>
         <UserButton />
       </div>
     </Card>
