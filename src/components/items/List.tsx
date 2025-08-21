@@ -19,7 +19,7 @@ const List = ({children,title,action:Action}: Props) => {
       'block':!isActive,
       'lg:block':isActive
     })}>
-      <div className='mb-4 flex items-center justfy-between'>
+      <div className='mb-4 flex items-center justify-between'>
         <h1 className='text-2xl font-semibold tracking-light'>{title}</h1>
         {Action ? Action:null}
       </div>

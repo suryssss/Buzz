@@ -1,10 +1,79 @@
-import React from 'react'
+"use client"
+import React from "react"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
+import { Button } from "@/components/ui/button"
+import { UserPlus } from "lucide-react"
+import { useMutationState } from "@/hooks/useMutationState"
+import { api } from "../../../../../convex/_generated/api"
+import { toast } from "sonner"
 
 type Props = {}
 
+const addFriendFormSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "This field can't be empty" })
+    .email("Please enter a valid email"),
+})
+
 const AddFriends = (props: Props) => {
+  const {mutate:createRequest,pending}=useMutationState(api.request.create)
+
+  const form = useForm<z.infer<typeof addFriendFormSchema>>({
+    resolver: zodResolver(addFriendFormSchema),
+    defaultValues: {
+      email: "",
+    },
+  })
+
+  const handleSubmit = async (values:z.infer<typeof addFriendFormSchema>)=>{
+    await createRequest({email: values.email}).then(() => {
+      form.reset();
+      toast.success("Friend request sent successfully")
+    }).catch((error)=>{
+      toast.error(error instanceof Error ? error.message : "Something went wrong")
+    })
+  }
+
   return (
-    <div>AddFriends</div>
+    <Dialog>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button size="icon" variant="outline">
+              <UserPlus />
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Add a friend</TooltipContent>
+      </Tooltip>
+
+      <DialogContent>
+        <DialogTitle>Add Friend</DialogTitle>
+        <DialogDescription>Enter the email of the friend you want to add.</DialogDescription>
+
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <div>
+            <input
+              type="email"
+              placeholder="Friend's email"
+              {...form.register("email")}
+              className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {form.formState.errors.email && (
+              <p className="text-red-500 text-sm mt-1">{form.formState.errors.email.message}</p>
+            )}
+          </div>
+          <Button type="submit" className="w-full">
+            Send Invite
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
   )
 }
 
