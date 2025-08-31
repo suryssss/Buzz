@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSignIn } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@clerk/nextjs";
 import {
   Card,
   CardHeader,
@@ -30,6 +31,7 @@ export default function SignInPage() {
   const [step, setStep] = useState(1);
   const [isReady, setIsReady] = useState(false);
   const [redirecting, setRedirecting] = useState(false)
+  const { isSignedIn } = useAuth();
 
 
   const handleAnimationComplete = () => {
@@ -66,6 +68,12 @@ export default function SignInPage() {
       </div>
     );
   }
+  if (isSignedIn) {
+    // User already signed in → redirect directly
+    router.push("/");
+    return;
+  }
+  
 
   if (!isReady) {
     return (

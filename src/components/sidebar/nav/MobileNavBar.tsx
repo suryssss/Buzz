@@ -8,28 +8,37 @@ import { Button } from '@/components/ui/button'
 import { useNavigation } from '@/hooks/useNavigation'
 import { useConversation } from '@/hooks/useConversation'
 import { ModeToggle } from '@/components/ui/theme/theme-toggle'
+import { Badge } from '@/components/ui/badge'
+
 const MobileNavBar = () => {
   const paths = useNavigation()
-  const {isActive}=useConversation()
+  const { isActive } = useConversation()
 
-  if (isActive) return null;
+  if (isActive) return null
 
   return (
-    <Card className='fixed bottom-4 w-[calc(100vw-32px)] flex items-center h-16 p-2 lg:hidden'>
-      <nav className='w-full'>
-        <ul className='flex justify-evenly items-center gap-4'>
+    <Card className="fixed bottom-4 w-[calc(100vw-32px)] flex items-center h-16 p-2 lg:hidden">
+      <nav className="w-full">
+        <ul className="flex justify-evenly items-center gap-4">
           {paths.map((path, id) => (
-            <li key={id} className='relative'>
+            <li key={id} className="relative">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link href={path.href}>
-                    <Button
-                      size="icon"
-                      variant={path.active ? "default" : "outline"}
-                    >
+                  <Button
+                    asChild
+                    size="icon"
+                    variant={path.active ? 'default' : 'outline'}
+                    className="relative"
+                  >
+                    <Link href={path.href}>
                       {path.icon}
-                    </Button>
-                  </Link>
+                      {path.count ? (
+                        <Badge className="absolute -right-2 -top-2 px-2 py-0 text-xs">
+                          {path.count}
+                        </Badge>
+                      ) : null}
+                    </Link>
+                  </Button>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>{path.name}</p>
@@ -37,10 +46,12 @@ const MobileNavBar = () => {
               </Tooltip>
             </li>
           ))}
-          <li><ModeToggle/></li>
-        <li>
-        <UserButton />
-      </li>
+          <li>
+            <ModeToggle />
+          </li>
+          <li>
+            <UserButton />
+          </li>
         </ul>
       </nav>
     </Card>
