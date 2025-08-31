@@ -20,7 +20,7 @@ const addFriendFormSchema = z.object({
     .email("Please enter a valid email"),
 })
 
-const AddFriends = (props: Props) => {
+const AddFriends = () => {
   const {mutate:createRequest,pending}=useMutationState(api.request.create)
 
   const form = useForm<z.infer<typeof addFriendFormSchema>>({
@@ -56,7 +56,7 @@ const AddFriends = (props: Props) => {
         <DialogTitle>Add Friend</DialogTitle>
         <DialogDescription>Enter the email of the friend you want to add.</DialogDescription>
 
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8">
           <div>
             <input
               type="email"
@@ -68,7 +68,7 @@ const AddFriends = (props: Props) => {
               <p className="text-red-500 text-sm mt-1">{form.formState.errors.email.message}</p>
             )}
           </div>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" disabled={pending}>
             Send Invite
           </Button>
         </form>

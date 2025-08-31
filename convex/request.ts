@@ -17,7 +17,6 @@ export const create = mutation({
       throw new Error("You can't send a request to yourself");
     }
 
-    // 👇 renamed to avoid confusion with Clerk's currentUser
     const senderUser = await getUserByClerkId({
       ctx,
       clerkId: identity.subject,
@@ -67,5 +66,37 @@ export const create = mutation({
     });
 
     return request;
+  },
+});
+
+export const deny = mutation({
+  args: {
+    id: v.id("requests"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error("Unauthorized");
+    }
+
+
+    
+    const senderUser = await getUserByClerkId({
+      ctx,
+      clerkId: identity.subject,
+    });
+
+    if (!senderUser) {
+      throw new Error("User not found");
+    }
+    const request =await ctx.db.get(args.id)
+
+    if (!request|| request.receiver!==senderUser._id){
+      throw new Error("Error Denying Request");
+    }
+
+    await ctx.db.delete(request._id)
+    
   },
 });
