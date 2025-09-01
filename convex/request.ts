@@ -59,6 +59,22 @@ export const create = mutation({
       throw new Error("Request already received");
     }
 
+
+    const friends1=await ctx.db.query
+    ("friends").withIndex("by_user1",(q)=>q.eq
+    ("user1",senderUser._id))
+    .collect()
+
+    const friends2=await ctx.db.query
+    ("friends").withIndex("by_user2",(q)=>q.eq
+    ("user2",senderUser._id))
+    .collect()
+
+    if(friends1.some(friend=>friend.user2===receiver._id)||friends2.some(friend=>friend.user1===receiver._id)){
+      throw new Error("You are already friends")
+    }
+
+
     // Insert new request
     const request = await ctx.db.insert("requests", {
       sender: senderUser._id,
@@ -100,3 +116,53 @@ export const deny = mutation({
     
   },
 });
+
+
+export const accept=mutation({
+  args:{
+    id:v.id("requests")
+  },handler:async(ctx,args)=>{
+     const identity=await ctx.auth.getUserIdentity()
+
+     if(!identity){
+      throw new Error("Unauthorized")
+     }
+
+     const senderUser=await getUserByClerkId({
+      ctx,
+      clerkId:identity.subject
+     })
+
+     if(!senderUser){
+      throw new Error("User not found")
+     }
+
+     const request=await ctx.db.get(args.id)
+
+     if(!request||request.receiver!==senderUser._id){
+      throw new Error("Error Accepting Request")
+     }
+     const conversationId=await ctx.db.insert("conversations",{
+      isGroup:false,
+     })
+
+     await ctx.db.insert("friends",{
+      user1:senderUser._id,
+      user2:request.sender,
+      conversationId,
+     })
+
+     await ctx.db.insert("conversationMembers",{
+      memberId:senderUser._id,
+      conversationId,
+     })
+
+     await ctx.db.insert("conversationMembers",{
+      memberId:request.sender,
+      conversationId,
+     })
+
+     await ctx.db.delete(request._id)
+     
+  }
+})
