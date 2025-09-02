@@ -8,6 +8,8 @@ import { Loader2 } from 'lucide-react'
 import Body from './components/Body'
 import ChatInput from './components/input/ChatInput'
 import Header from './components/Header'
+import { useState } from 'react'
+import RemoveFriendDialog from './components/RemoveFriendDialog'
 
 type Props = {
   params: Promise<{
@@ -19,6 +21,11 @@ const Conversations = ({ params }: Props) => {
   const { conversationId } = use(params) // ✅ unwrap params with React.use()
 
   const data = useQuery(api.conversations.get, { id: conversationId })
+
+  const [removeFriendDialogOpen,setRemoveFriendDialogOpen]=useState(false)
+  const [deleteGroupDialogOpen,setDeleteGroupDialogOpen]=useState(false)
+  const [leaveGroupDialogOpen,setLeaveGroupDialogOpen]=useState(false)
+  const [callType,setCallType]=useState<'audio' | 'video' | null>(null)
 
   if (data === undefined) {
     return (
@@ -47,9 +54,22 @@ const Conversations = ({ params }: Props) => {
     ? undefined
     : data.otherMember?.imageUrl
 
+  const options=conversation.isGroup ? [
+    {label:"Leave Group",destructive:false,onClick:()=>setLeaveGroupDialogOpen(true)
+    },
+    {label:"Delete Group",destructive:true,onClick:()=>setDeleteGroupDialogOpen(true)
+    },
+  ] :[
+    {
+      label:"Remove Friend",destructive:true,onClick:()=>setRemoveFriendDialogOpen(true)
+    }
+  ]
+   
+
   return (
     <ConvoContainer>
-      <Header name={name!} imageUrl={imageUrl} />
+      <RemoveFriendDialog open={removeFriendDialogOpen} setOpen={setRemoveFriendDialogOpen} conversationId={conversationId}/>
+      <Header name={name!} imageUrl={imageUrl} options={options}/>
       <Body />
       <ChatInput />
     </ConvoContainer>
