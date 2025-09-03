@@ -6,6 +6,7 @@ import React from "react";
 import { api } from "../../../../convex/_generated/api";
 import { Loader2 } from "lucide-react";
 import MessageItem from "./components/MessageItem";
+import CreateGroupDialog from "./components/CreateGroupDialog";
 
 type Props = React.PropsWithChildren<{}>;
 
@@ -15,7 +16,7 @@ const ConversationLayout = ({ children }: Props) => {
 
   return (
     <>
-    <List title="Conversations">
+    <List title="Conversations" action={<CreateGroupDialog/>}>
       {
         conversations ? conversations.length===0 ? <p className="w-full h-full flex items-center justify-center">
             No Conversations Found</p>: conversations.map(conversations=>{
