@@ -13,7 +13,8 @@ export const create = mutation({
       throw new Error("Unauthorized");
     }
 
-    if (args.email === identity.email) {
+    // Clerk identity uses emailAddress
+    if (args.email === (identity as any).emailAddress) {
       throw new Error("You can't send a request to yourself");
     }
 
@@ -142,6 +143,25 @@ export const accept=mutation({
      if(!request||request.receiver!==senderUser._id){
       throw new Error("Error Accepting Request")
      }
+     // Prevent duplicate friendship (idempotency)
+     const existingFromUser1 = await ctx.db
+       .query("friends")
+       .withIndex("by_user1", (q) => q.eq("user1", senderUser._id))
+       .collect();
+     const existingFromUser2 = await ctx.db
+       .query("friends")
+       .withIndex("by_user2", (q) => q.eq("user2", senderUser._id))
+       .collect();
+
+     const alreadyFriends =
+       existingFromUser1.some((f) => f.user2 === request.sender) ||
+       existingFromUser2.some((f) => f.user1 === request.sender);
+
+     if (alreadyFriends) {
+       await ctx.db.delete(request._id);
+       return;
+     }
+
      const conversationId=await ctx.db.insert("conversations",{
       isGroup:false,
      })

@@ -28,6 +28,27 @@ export const create = mutation({
       .unique();
 
     if (!member) throw new Error("You are not member of this conversation");
+    // Basic content validation
+    const text = (args.content || []).join("");
+    if (text.length === 0) {
+      throw new Error("Message cannot be empty");
+    }
+    if (text.length > 4000) {
+      throw new Error("Message too long");
+    }
+
+    // Naive rate limit: 1 message per 300ms per user
+    const recent = await ctx.db
+      .query("messages")
+      .withIndex("by_conversationId", (q) => q.eq("conversationId", args.conversationId))
+      .order("desc")
+      .take(10);
+    const now = Date.now();
+    const lastMine = recent.find((m) => m.senderId === currentUser._id);
+    if (lastMine && now - lastMine._creationTime < 300) {
+      throw new Error("You are sending messages too quickly. Please wait a moment.");
+    }
+
     const message = await ctx.db.insert("messages", {
       senderId: currentUser._id,
       ...args,

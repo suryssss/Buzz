@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { Button } from "@/components/ui/button"
+import { motion } from "framer-motion"
 import { UserPlus } from "lucide-react"
 import { useMutationState } from "@/hooks/useMutationState"
 import { api } from "../../../../../convex/_generated/api"
@@ -44,9 +45,11 @@ const AddFriends: React.FC = () => {
       <Tooltip>
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
-            <Button size="icon" variant="outline">
-              <UserPlus />
-            </Button>
+            <motion.div whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.96 }}>
+              <Button size="icon" variant="outline">
+                <UserPlus />
+              </Button>
+            </motion.div>
           </DialogTrigger>
         </TooltipTrigger>
         <TooltipContent>Add a friend</TooltipContent>

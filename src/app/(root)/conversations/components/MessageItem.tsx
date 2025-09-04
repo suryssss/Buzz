@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import Link from "next/link";
 import { User } from "lucide-react";
@@ -23,6 +24,7 @@ const MessageItem = ({
 }: Props) => {
   return (
     <Link href={`/conversations/${id}`} className="w-full">
+      <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.18, ease: 'easeOut' }}>
       <Card className="p-2 flex flex-row items-center gap-4 truncate">
         <div className="flex flex-row items-center gap-4 truncate">
           <Avatar>
@@ -46,6 +48,7 @@ const MessageItem = ({
           )}
         </div>
       </Card>
+      </motion.div>
     </Link>
   );
 };

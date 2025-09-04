@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { useNavigation } from '@/hooks/useNavigation'
 import { ModeToggle } from '@/components/ui/theme/theme-toggle'
 import { Badge } from '@/components/ui/badge'
+import { motion } from 'framer-motion'
 
 const NavBar = () => {
   const paths = useNavigation()
@@ -20,6 +21,7 @@ const NavBar = () => {
             <li key={id} className="relative">
               <Tooltip>
                 <TooltipTrigger asChild>
+                  <motion.div whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.96 }}>
                   <Button
                     asChild
                     size="icon"
@@ -35,6 +37,7 @@ const NavBar = () => {
                       ) : null}
                     </Link>
                   </Button>
+                  </motion.div>
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>{path.name}</p>

@@ -55,14 +55,6 @@ export const get = query({
         otherMembers: [],
         members: [],
       };
-    }else{
-      const otherMembers=(await Promise.all(allConversationMembers.filter(member=>member.memberId!==currentUser._id))).map(async membership=>{
-        const member=await ctx.db.get(membership.memberId)
-        if(!member) throw new Error("Member could not be found")
-        return {
-          username:member.username
-        }
-      })
     }
     // group conversation → return with members
     const otherMembers = await Promise.all(
@@ -146,8 +138,8 @@ export const deleteGroup = mutation({
     .withIndex("by_conversationId",(q)=>q.eq("conversationId",args.conversationId))
     .collect()
 
-    if(!members||members.length<=1){
-        throw new Error("Conversation do not have any members")
+    if (!members || members.length <= 1) {
+        throw new Error("Conversation does not have enough members")
     }
 
     
@@ -235,11 +227,19 @@ export const MarkRead = mutation({
         throw new Error("You are not the member of the group")
     }
 
-    const lastmessage=await ctx.db.get(args.messageId)
-    
-    await ctx.db.patch(member._id,{
-      lastSeenMessage:lastmessage?
-      lastmessage._id:undefined,
+    const lastMessage = await ctx.db.get(args.messageId)
+    if (!lastMessage) return
+
+    // Idempotency: only update if newer than current
+    if (member.lastSeenMessage) {
+      const current = await ctx.db.get(member.lastSeenMessage)
+      if (current && current._creationTime >= lastMessage._creationTime) {
+        return
+      }
+    }
+
+    await ctx.db.patch(member._id, {
+      lastSeenMessage: lastMessage._id,
     })
 
   },

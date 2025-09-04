@@ -8,10 +8,18 @@ import { internal } from "./_generated/api";
 const validatePayload = async (req: Request): Promise<WebhookEvent | undefined> => {
   const payload = await req.text();
 
+  const id = req.headers.get("svix-id");
+  const timestamp = req.headers.get("svix-timestamp");
+  const signature = req.headers.get("svix-signature");
+
+  if (!id || !timestamp || !signature) {
+    return undefined;
+  }
+
   const svixHeaders = {
-    "svix-id": req.headers.get("svix-id")!,
-    "svix-timestamp": req.headers.get("svix-timestamp")!,
-    "svix-signature": req.headers.get("svix-signature")!,
+    "svix-id": id,
+    "svix-timestamp": timestamp,
+    "svix-signature": signature,
   };
 
   const webhook = new Webhook(process.env.CLERK_WEBHOOK_SECRET || "");
@@ -64,7 +72,7 @@ const handleClerkWebhook = httpAction(async (ctx, req) => {
       console.log(`♻️ Updating user ${event.data.id}`);
 
       await ctx.runMutation(internalApi.user.create, {
-        username: `${event.data.first_name ?? ""} ${event.data.last_name ?? ""}`.trim(),
+        username: `${event.data.first_name ?? ""} ${event.data.last_name ?? ""}`.trim() || event.data.username || "",
         imageUrl: event.data.image_url,
         clerkId: event.data.id,
         email: event.data.email_addresses[0]?.email_address ?? "",

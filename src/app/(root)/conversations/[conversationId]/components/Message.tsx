@@ -38,7 +38,11 @@ const Message = ({
                 "rounded-br-none":!lastMessageByUser && fromCurrentUser,
                 "rounded-bl-none":!lastMessageByUser && !fromCurrentUser,
             })}>
-                {type=="text" ?( <p className='text-wrap break-words whitespace-pre-wrap break-all'>{content}</p>):null}
+                {type=="text" ? (
+                  <p className='text-wrap break-words whitespace-pre-wrap break-all'>
+                    {content.join("")}
+                  </p>
+                ) : null}
                 <p className={cn("text-xs flex w-full my-1",{"text-primary-foreground justify-end":fromCurrentUser,
                     "text-secondary-foreground justify-start":!fromCurrentUser
                 })}>{formatTime(createdAt)}</p>

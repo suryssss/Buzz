@@ -68,10 +68,16 @@ export default function SignInPage() {
       </div>
     );
   }
-  if (isSignedIn) {
-    // User already signed in → redirect directly
-    router.push("/");
-    return;
+  
+  // Redirect after mount to avoid updating Router during render
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.replace("/");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  if (isLoaded && isSignedIn) {
+    return <LoadingScreen />;
   }
   
 

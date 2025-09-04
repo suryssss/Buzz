@@ -26,8 +26,8 @@ export const remove = mutation({
     .withIndex("by_conversationId",(q)=>q.eq("conversationId",args.conversationId))
     .collect()
 
-    if(!members||members.length!==2){
-        throw new Error("Conversation do not have any members")
+    if(!members||members.length !== 2){
+        throw new Error("Conversation does not have the expected members")
     }
 
     const friendships=await ctx.db.query("friends")
@@ -35,7 +35,7 @@ export const remove = mutation({
     .unique()
 
     if(!friendships){
-        throw new Error("Friend could not found")
+        throw new Error("Friendship could not be found")
     }
 
     const message=await ctx.db.query("messages")

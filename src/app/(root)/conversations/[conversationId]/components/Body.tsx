@@ -1,7 +1,8 @@
 'use client'
 import { useConversation } from '@/hooks/useConversation'
 import { useQuery } from 'convex/react'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { api } from '../../../../../../convex/_generated/api'
 import { Id } from '../../../../../../convex/_generated/dataModel'
 import Message from './Message'
@@ -24,16 +25,70 @@ const Body = (props: Props) => {
 
   const messages = useQuery(api.messages.get, {
     id: conversationId as Id<'conversations'>,
+    limit: 50,
   })
 
+  // Optimistic messages shown immediately before server ack
+  const [optimistic, setOptimistic] = useState<Array<any>>([])
+
+  const lastMarkedRef = useRef<string | null>(null)
+
   useEffect(()=>{
-    if(messages && messages.length>0){
+    if (!messages || messages.length === 0) return;
+    // Only when tab is visible
+    if (typeof document !== 'undefined' && document.visibilityState !== 'visible') return;
+    const newest = messages[0];
+    const newestId = newest._id as string;
+    // Do not mark if it's my own message
+    if (newest.isCurrentUser) return;
+    // Skip if already marked by members prop
+    const alreadySeen = Array.isArray(props.members) && props.members.some((m:any)=> m?.lastSeenMessageId === newestId);
+    if (alreadySeen) return;
+    if (lastMarkedRef.current === newestId) return;
+    lastMarkedRef.current = newestId;
+    const t = setTimeout(() => {
       markRead({
         conversationId,
-        messageId:messages[0]._id,
+        messageId: newest._id,
       })
+    }, 500);
+    return () => clearTimeout(t);
+  },[messages,props.members,conversationId,markRead])
+
+  // Listen for optimistic message events dispatched by the input
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { content: string }
+      if (!detail?.content) return
+      const now = Date.now()
+      const temp = {
+        _id: `temp-${now}`,
+        senderId: 'me',
+        content: [detail.content],
+        _creationTime: now,
+        type: 'text',
+        senderImage: '',
+        senderName: 'You',
+        isCurrentUser: true,
+      }
+      setOptimistic((prev) => [temp, ...prev])
     }
-  },[messages,conversationId,markRead])
+    document.addEventListener('optimistic-message', handler as EventListener)
+    return () => document.removeEventListener('optimistic-message', handler as EventListener)
+  }, [])
+
+  // Reconcile: drop optimistic items once matching server messages arrive
+  useEffect(() => {
+    if (!messages || optimistic.length === 0) return
+    setOptimistic((prev) =>
+      prev.filter((opt) => {
+        const match = messages.find(
+          (m) => m.isCurrentUser && Array.isArray(m.content) && m.content.join('') === opt.content.join('') && m._creationTime >= opt._creationTime
+        )
+        return !match
+      })
+    )
+  }, [messages, optimistic.length])
 
 
   const formatSeenBy=(name:string[])=>{
@@ -75,33 +130,40 @@ const Body = (props: Props) => {
   }
 
 
+  // Combine optimistic + server messages (both newest-first)
+  const combined = [...optimistic, ...(messages ?? [])]
+
   return (
     <div className="flex-1 w-full flex overflow-y-scroll flex-col-reverse gap-2 p-3 no-scrollbar">
-      {messages?.map((msg, index) => {
+      <AnimatePresence initial={false}>
+      {combined?.map((msg, index) => {
         const lastMessageByUser =
-          index > 0 && messages[index - 1].senderId === msg.senderId
+          index > 0 && combined[index - 1].senderId === msg.senderId
 
           const seenMessage=msg.isCurrentUser ? getseenMessage(msg._id) : undefined
-          
-          // Debug log
-          if(msg.isCurrentUser) {
-            console.log('Message from current user:', msg._id, 'Seen message:', seenMessage, 'Members:', props.members)
-          }
 
         return (
-          <Message
+          <motion.div
             key={msg._id}
-            fromCurrentUser={msg.isCurrentUser}
-            senderImage={msg.senderImage}
-            senderName={msg.senderName}
-            lastMessageByUser={lastMessageByUser}
-            content={msg.content}
-            createdAt={msg._creationTime}
-            type={msg.type}
-            seen={seenMessage}
-          />
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: 'easeOut' }}
+          >
+            <Message
+              fromCurrentUser={msg.isCurrentUser}
+              senderImage={msg.senderImage}
+              senderName={msg.senderName}
+              lastMessageByUser={lastMessageByUser}
+              content={msg.content}
+              createdAt={msg._creationTime}
+              type={msg.type}
+              seen={seenMessage}
+            />
+          </motion.div>
         )
       })}
+      </AnimatePresence>
     </div>
   )
 }

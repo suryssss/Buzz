@@ -9,7 +9,23 @@ export const create = mutation({
     email: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.db.insert("users", args);
+    // Upsert by clerkId to avoid duplicate users
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_clerkId", (q) => q.eq("clerkId", args.clerkId))
+      .unique();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        username: args.username,
+        imageUrl: args.imageUrl,
+        email: args.email,
+      });
+      return existing._id;
+    }
+
+    const id = await ctx.db.insert("users", args);
+    return id;
   },
 });
 

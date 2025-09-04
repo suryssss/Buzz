@@ -6,9 +6,10 @@ import { v } from "convex/values";
 
 export const get = query({
   args: {
-    id:v.id("conversations")
+    id: v.id("conversations"),
+    limit: v.optional(v.number()),
   },
-  handler: async (ctx,args) => {
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Unauthorized");
 
@@ -29,24 +30,32 @@ export const get = query({
 
   if (!member) throw new Error("You are not member of this conversation");
 
-    const messages=await ctx.db.query("messages")
-    .withIndex("by_conversationId",(q)=>q.eq("conversationId",args.id))
-    .order("desc").collect()
+    const limit = Math.max(1, Math.min(args.limit ?? 50, 200));
 
-    const messagesWithUser=Promise.all(
-        messages.map(async messages =>{
-            const messageSender=await ctx.db.get(messages.senderId)
-            if(!messageSender) throw new Error("Message sender not found")
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_conversationId", (q) => q.eq("conversationId", args.id))
+      .order("desc")
+      .take(limit);
 
-            return {
-                ...messages,
-                senderImage: messageSender.imageUrl,
-                senderName:messageSender.username,
-                isCurrentUser:messageSender._id===currentUser._id
-            }
-        })
-    )
+    const uniqueSenderIds = Array.from(new Set(messages.map((m) => m.senderId)));
+    const senders = await Promise.all(uniqueSenderIds.map((id) => ctx.db.get(id)));
+    const senderById = new Map(
+      senders
+        .filter(Boolean)
+        .map((s) => [s!._id, { imageUrl: s!.imageUrl, username: s!.username }])
+    );
 
-    return messagesWithUser
+    const enriched = messages.map((m) => {
+      const sender = senderById.get(m.senderId);
+      return {
+        ...m,
+        senderImage: sender?.imageUrl ?? "",
+        senderName: sender?.username ?? "Unknown",
+        isCurrentUser: m.senderId === currentUser._id,
+      };
+    });
+
+    return enriched;
   },
 });
