@@ -13,14 +13,14 @@ import TextareaAutosize from "react-textarea-autosize"
 import { Button } from '@/components/ui/button'
 import { SendHorizonal } from 'lucide-react'
  
- type Props = {}
+ type Props = object
 
  const chatMessageSchema=z.object({
     content:z.string().min(1,{message:"Message cannot be empty"}),
 
  })
  
- const ChatInput = (props: Props) => {
+ const ChatInput = () => {
 
     const textareaRef=useRef<HTMLTextAreaElement | null>(null)
 
@@ -34,9 +34,8 @@ import { SendHorizonal } from 'lucide-react'
         defaultValues :{content:""}
     })
 
-    const handleInputChange=(event:any)=>{
-        const{value,selectionStart}=
-        event.target;
+    const handleInputChange=(event: React.ChangeEvent<HTMLTextAreaElement>)=>{
+        const { value, selectionStart } = event.target;
 
         if(selectionStart!==null){
             form.setValue("content",value)

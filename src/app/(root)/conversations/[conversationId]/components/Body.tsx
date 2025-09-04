@@ -1,5 +1,4 @@
 'use client'
-import { Card } from '@/components/ui/card'
 import { useConversation } from '@/hooks/useConversation'
 import { useQuery } from 'convex/react'
 import React, { useEffect } from 'react'
@@ -10,12 +9,12 @@ import { useMutationState } from '@/hooks/useMutationState'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 type Props = {
-  members:{
-    lastSeenMessageId?:Id<"messages">,
-    username?:string;
-    [key:string]:any
+  members: Member[]
+}
 
-  }[]
+type Member = {
+  lastSeenMessageId?: Id<'messages'>
+  username?: string
 }
 
 const Body = (props: Props) => {
@@ -34,7 +33,7 @@ const Body = (props: Props) => {
         messageId:messages[0]._id,
       })
     }
-  },[messages?.length,conversationId,markRead])
+  },[messages,conversationId,markRead])
 
 
   const formatSeenBy=(name:string[])=>{
@@ -62,11 +61,12 @@ const Body = (props: Props) => {
     }
   }
 
-  const getseenMessage=(messageId:Id<"messages">)=>{
+  const getseenMessage=(messageId:Id<'messages'>)=>{
     if(!props.members || props.members.length === 0) return undefined;
     
-    const seenUsers=props.members.filter((member: any)=>
-      member.lastSeenMessageId===messageId).map((user: any)=> user.username!.split("")[0])
+    const seenUsers = props.members
+      .filter((member: Member) => member.lastSeenMessageId === messageId)
+      .map((user: Member) => (user.username ?? '').split('')[0])
 
       if(seenUsers.length===0)return undefined;
 
