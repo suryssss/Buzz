@@ -61,14 +61,6 @@ export default function SignInPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (!isLoaded) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-black">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
-    );
-  }
-  
   // Redirect after mount to avoid updating Router during render
   useEffect(() => {
     if (isLoaded && isSignedIn) {
@@ -76,7 +68,7 @@ export default function SignInPage() {
     }
   }, [isLoaded, isSignedIn, router]);
 
-  if (isLoaded && isSignedIn) {
+  if (!isLoaded || (isLoaded && isSignedIn)) {
     return <LoadingScreen />;
   }
   

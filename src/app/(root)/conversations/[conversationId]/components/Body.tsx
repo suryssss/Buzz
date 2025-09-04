@@ -29,7 +29,16 @@ const Body = (props: Props) => {
   })
 
   // Optimistic messages shown immediately before server ack
-  const [optimistic, setOptimistic] = useState<Array<any>>([])
+  const [optimistic, setOptimistic] = useState<Array<{
+    _id: string;
+    content: string[];
+    _creationTime: number;
+    isCurrentUser: boolean;
+    senderId: string;
+    senderImage: string;
+    senderName: string;
+    type: string;
+  }>>([])
 
   const lastMarkedRef = useRef<string | null>(null)
 
@@ -42,7 +51,7 @@ const Body = (props: Props) => {
     // Do not mark if it's my own message
     if (newest.isCurrentUser) return;
     // Skip if already marked by members prop
-    const alreadySeen = Array.isArray(props.members) && props.members.some((m:any)=> m?.lastSeenMessageId === newestId);
+    const alreadySeen = Array.isArray(props.members) && props.members.some((m: Member)=> m?.lastSeenMessageId === newestId);
     if (alreadySeen) return;
     if (lastMarkedRef.current === newestId) return;
     lastMarkedRef.current = newestId;
@@ -140,7 +149,10 @@ const Body = (props: Props) => {
         const lastMessageByUser =
           index > 0 && combined[index - 1].senderId === msg.senderId
 
-          const seenMessage=msg.isCurrentUser ? getseenMessage(msg._id) : undefined
+          const seenMessage =
+            msg.isCurrentUser && typeof msg._id !== 'string'
+              ? getseenMessage(msg._id as Id<'messages'>)
+              : undefined
 
         return (
           <motion.div
