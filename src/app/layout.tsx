@@ -5,6 +5,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "../components/ui/theme/theme-provider";
 import { Toaster} from "../components/ui/sonner"
 
+
+export const Metadata={
+  title:"Buzz",
+  Description:"A chat app"
+}
+
 export default function RootLayout({
   children,
 }: {

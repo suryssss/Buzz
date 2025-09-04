@@ -211,8 +211,7 @@ export const leaveGroup = mutation({
 export const MarkRead = mutation({
   args: {
     conversationId: v.id("conversations"),
-    type: v.optional(v.string()),
-    content: v.optional(v.array(v.string())),
+    messageId:v.id("messages")
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -236,7 +235,12 @@ export const MarkRead = mutation({
         throw new Error("You are not the member of the group")
     }
 
-    await ctx.db.delete(member._id)
+    const lastmessage=await ctx.db.get(args.messageId)
+    
+    await ctx.db.patch(member._id,{
+      lastSeenMessage:lastmessage?
+      lastmessage._id:undefined,
+    })
 
   },
 });
