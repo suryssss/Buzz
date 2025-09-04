@@ -12,6 +12,7 @@ type Props = {
     lastMessageByUser:boolean;
     content:string[];
     createdAt:number;
+    seen?:React.ReactNode;
     type:string;
 }
 
@@ -22,7 +23,8 @@ const Message = ({
     lastMessageByUser,
     content,
     createdAt,
-    type
+    type,
+    seen,
 }: Props) => {
     const formatTime=(timeStamp:number)=>{
         return format(timeStamp,"HH:mm")
@@ -36,11 +38,12 @@ const Message = ({
                 "rounded-br-none":!lastMessageByUser && fromCurrentUser,
                 "rounded-bl-none":!lastMessageByUser && !fromCurrentUser,
             })}>
-                {type=="text" ?( <p className='text-wrap break-words whitespace-pre-wrap'>{content}</p>):null}
+                {type=="text" ?( <p className='text-wrap break-words whitespace-pre-wrap break-all'>{content}</p>):null}
                 <p className={cn("text-xs flex w-full my-1",{"text-primary-foreground justify-end":fromCurrentUser,
                     "text-secondary-foreground justify-start":!fromCurrentUser
                 })}>{formatTime(createdAt)}</p>
             </div>
+            {seen}
         </div>
         <Avatar className={cn("h-8 w-8",{"order-2 items-end":fromCurrentUser,"order-1 items-start":!fromCurrentUser,"invisible":lastMessageByUser})}>
                 <AvatarImage src={senderImage}/>
