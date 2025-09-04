@@ -1,7 +1,7 @@
 import ConversationFallback from '@/components/items/conversation/ConversationFallback'
 import React from 'react'
 
-type Props = {}
+type Props = object
 
 function ConversationsPage({}: Props) {
   return (

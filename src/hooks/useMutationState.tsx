@@ -1,11 +1,12 @@
 import { useMutation } from "convex/react";
 import { useState } from "react";
 
-export const useMutationState = (mutationTorun:any) => {
+export const useMutationState = <TArgs extends object, TResult = unknown>(mutationToRun: unknown) => {
     const [pending,setPending]=useState(false);
-    const mutationfn=useMutation(mutationTorun)
+    type MutationExecutor = (args: TArgs) => Promise<TResult>;
+    const mutationfn = (useMutation(mutationToRun as never) as unknown) as MutationExecutor;
 
-    const mutate=(payload:any)=>{
+    const mutate = (payload: TArgs) => {
         setPending(true)
 
         return mutationfn(payload)

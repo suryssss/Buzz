@@ -2,7 +2,7 @@ import React from 'react'
 import NavBar from './nav/NavBar'
 import MobileNavBar from './nav/MobileNavBar'
 
-type Props = React.PropsWithChildren<{}>
+type Props = React.PropsWithChildren<object>
 
 const SidebarAni = ({ children }: Props) => {
   return (

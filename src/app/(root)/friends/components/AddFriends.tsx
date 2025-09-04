@@ -11,7 +11,7 @@ import { useMutationState } from "@/hooks/useMutationState"
 import { api } from "../../../../../convex/_generated/api"
 import { toast } from "sonner"
 
-type Props = {}
+// No props for this component
 
 const addFriendFormSchema = z.object({
   email: z
@@ -20,7 +20,7 @@ const addFriendFormSchema = z.object({
     .email("Please enter a valid email"),
 })
 
-const AddFriends = () => {
+const AddFriends: React.FC = () => {
   const {mutate:createRequest,pending}=useMutationState(api.request.create)
 
   const form = useForm<z.infer<typeof addFriendFormSchema>>({

@@ -5,12 +5,12 @@ import React from 'react'
 import AddFriends from './components/AddFriends'
 import { useQuery } from 'convex/react'
 import { api } from '../../../../convex/_generated/api'
-import { Loader, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import Request from './components/Request'
 
-type Props = {}
+// No props for this page
 
-const FriendsPage = (props: Props) => {
+const FriendsPage = () => {
   const requests=useQuery(api.requests.get)
   return (
     <>

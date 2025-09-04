@@ -4,7 +4,6 @@ import { Card } from "../../../../components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Check, User, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useMutation } from 'convex/react'
 import { useMutationState } from '@/hooks/useMutationState'
 import { api } from '../../../../../convex/_generated/api'
 import { toast } from 'sonner'
@@ -37,6 +36,7 @@ const Request = ({ id, imageUrl, username, email }: Props) => {
       </div>
       <div className='flex flex-col truncate'>
            <h4 className='truncate'>{username}</h4>
+           <span className='text-xs text-muted-foreground truncate'>{email}</span>
         </div>
         <div className='flex items-center gap-2'>
           <Button size='icon'disabled={denyPending || acceptRequestPending} onClick={()=>{acceptRequest({id})

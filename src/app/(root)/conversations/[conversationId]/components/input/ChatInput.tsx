@@ -2,7 +2,7 @@
 import { Card } from '@/components/ui/card'
 import { useConversation } from '@/hooks/useConversation'
 import { useMutationState } from '@/hooks/useMutationState'
-import React, { useRef } from 'react'
+import React from 'react'
 import z from 'zod'
 import { api } from '../../../../../../../convex/_generated/api'
 import { useForm } from 'react-hook-form'
@@ -12,17 +12,12 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import TextareaAutosize from "react-textarea-autosize"
 import { Button } from '@/components/ui/button'
 import { SendHorizonal } from 'lucide-react'
- 
- type Props = object
-
  const chatMessageSchema=z.object({
     content:z.string().min(1,{message:"Message cannot be empty"}),
 
  })
  
  const ChatInput = () => {
-
-    const textareaRef=useRef<HTMLTextAreaElement | null>(null)
 
 
     const {conversationId}=useConversation();
@@ -70,7 +65,6 @@ import { SendHorizonal } from 'lucide-react'
                         }}
                         rows={1} maxRows={3}
                             {...field} onChange={handleInputChange}
-                            onClick={handleInputChange}
                             placeholder='Type your message here...'
                             className='min-h-full w-full resize-none border-0 outline-0 bg-card text-card-foreground 
                             placeholder:text-muted-foreground p-1.5 '/> 

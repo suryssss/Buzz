@@ -23,6 +23,14 @@ const validatePayload = async (req: Request): Promise<WebhookEvent | undefined> 
   }
 };
 
+// Narrow the internal API typing to avoid TS issues in Next build context
+const internalApi = internal as unknown as {
+  user: {
+    get: any;
+    create: any;
+  };
+};
+
 const handleClerkWebhook = httpAction(async (ctx, req) => {
   const event = await validatePayload(req);
 
@@ -32,7 +40,7 @@ const handleClerkWebhook = httpAction(async (ctx, req) => {
 
   switch (event.type) {
     case "user.created": {
-      const user = await ctx.runQuery(internal.user.get, {
+      const user = await ctx.runQuery(internalApi.user.get, {
         clerkId: event.data.id,
       });
 
@@ -42,7 +50,7 @@ const handleClerkWebhook = httpAction(async (ctx, req) => {
         console.log(`🆕 Creating new user ${event.data.id}`);
       }
 
-      await ctx.runMutation(internal.user.create, {
+      await ctx.runMutation(internalApi.user.create, {
         username:event.data.username ?? "",
         imageUrl: event.data.image_url,
         clerkId: event.data.id,
@@ -55,7 +63,7 @@ const handleClerkWebhook = httpAction(async (ctx, req) => {
     case "user.updated": {
       console.log(`♻️ Updating user ${event.data.id}`);
 
-      await ctx.runMutation(internal.user.create, {
+      await ctx.runMutation(internalApi.user.create, {
         username: `${event.data.first_name ?? ""} ${event.data.last_name ?? ""}`.trim(),
         imageUrl: event.data.image_url,
         clerkId: event.data.id,

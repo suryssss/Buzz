@@ -1,7 +1,7 @@
 import { Card } from '@/components/ui/card'
 import React from 'react'
 
-type Props=React.PropsWithChildren<{}>
+type Props=React.PropsWithChildren<object>
 
 const ConvoContainer = ({children}: Props) => {
   return (

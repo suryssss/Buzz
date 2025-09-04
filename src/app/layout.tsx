@@ -4,11 +4,12 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "../components/ui/theme/theme-provider";
 import { Toaster} from "../components/ui/sonner"
+import type { Metadata } from "next"
 
 
-export const Metadata={
-  title:"Buzz",
-  Description:"A chat app"
+export const metadata: Metadata = {
+  title: "Buzz",
+  description: "A chat app",
 }
 
 export default function RootLayout({
