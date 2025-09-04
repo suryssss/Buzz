@@ -9,7 +9,7 @@ import MessageItem from "./components/MessageItem";
 import CreateGroupDialog from "./components/CreateGroupDialog";
 import GroupCoversationMessageItem from "./components/GroupConversationItem";
 
-type Props = React.PropsWithChildren<{}>;
+type Props = React.PropsWithChildren<object>;
 
 const ConversationLayout = ({ children }: Props) => {
 

@@ -11,14 +11,14 @@ import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { Button } from '@/components/ui/button'
-import { CirclePlus, Turntable, X } from 'lucide-react'
+import { CirclePlus, X } from 'lucide-react'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Card } from '@/components/ui/card'
 
-type Props = {}
+// No props are required for this component
 
 const createGroupFormSchema=z.object({
     name:z.string().min(1,{message:"This field can't be entered"}),
@@ -26,7 +26,7 @@ const createGroupFormSchema=z.object({
     .min(1,{message:"You must select atleast one friend"}),
 })
 
-const CreateGroupDialog = (props: Props) => {
+const CreateGroupDialog = () => {
 
 const friends=useQuery(api.friends.get)
 
@@ -44,7 +44,7 @@ const members=form.watch("members",[])
 
 const unselectedFriends = useMemo(() => {
   return friends ? friends.filter(friend => !members.includes(friend._id)) : [];
-}, [members.length, friends?.length]);
+}, [members, friends]);
 
 const handleSubmit=async(values:z.infer<typeof createGroupFormSchema>)=>{
   await createGroup({members:values.members,name:values.name}).then(()=>{

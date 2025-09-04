@@ -1,10 +1,9 @@
 import React from "react";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import Link from "next/link";
-import { User } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
-import { AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AvatarFallback } from "@/components/ui/avatar";
 
 type Props = {
   id: Id<"conversations">;
