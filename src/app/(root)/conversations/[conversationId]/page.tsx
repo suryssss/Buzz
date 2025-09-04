@@ -74,7 +74,7 @@ const Conversations = ({ params }: Props) => {
       <DeleteGroupDialog open={deleteGroupDialogOpen} setOpen={setDeleteGroupDialogOpen} conversationId={conversationId}/>
       <RemoveGroupDialog open={leaveGroupDialogOpen} setOpen={setLeaveGroupDialogOpen} conversationId={conversationId}/>
       <Header name={name!} imageUrl={imageUrl} options={options}/>
-      <Body />
+      <Body members={conversation.isGroup ? data.otherMembers || [] : data.otherMember ? [data.otherMember] : []} />
       <ChatInput />
     </ConvoContainer>
   )
