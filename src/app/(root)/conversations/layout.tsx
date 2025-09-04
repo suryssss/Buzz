@@ -7,6 +7,7 @@ import { api } from "../../../../convex/_generated/api";
 import { Loader2 } from "lucide-react";
 import MessageItem from "./components/MessageItem";
 import CreateGroupDialog from "./components/CreateGroupDialog";
+import GroupCoversationMessageItem from "./components/GroupConversationItem";
 
 type Props = React.PropsWithChildren<{}>;
 
@@ -20,7 +21,12 @@ const ConversationLayout = ({ children }: Props) => {
       {
         conversations ? conversations.length===0 ? <p className="w-full h-full flex items-center justify-center">
             No Conversations Found</p>: conversations.map(conversations=>{
-              return conversations.conversation.isGroup ? null : <MessageItem 
+              return conversations.conversation.isGroup ? <GroupCoversationMessageItem 
+              key={conversations.conversation._id} 
+              id={conversations.conversation._id}
+              name={conversations.conversation.name || ""}
+              lastMessageContent={conversations.lastMessage?.content}
+              lastMessageSender={conversations.lastMessage?.sender} />  : <MessageItem 
               key={conversations.conversation._id} 
               id={conversations.conversation._id}
               username={conversations.otherMember?.username || ""}

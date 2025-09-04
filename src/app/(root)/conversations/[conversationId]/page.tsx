@@ -10,6 +10,8 @@ import ChatInput from './components/input/ChatInput'
 import Header from './components/Header'
 import { useState } from 'react'
 import RemoveFriendDialog from './components/RemoveFriendDialog'
+import DeleteGroupDialog from './components/DeleteGroupDialog'
+import RemoveGroupDialog from './components/RemoveGroupDialog'
 
 type Props = {
   params: Promise<{
@@ -69,6 +71,8 @@ const Conversations = ({ params }: Props) => {
   return (
     <ConvoContainer>
       <RemoveFriendDialog open={removeFriendDialogOpen} setOpen={setRemoveFriendDialogOpen} conversationId={conversationId}/>
+      <DeleteGroupDialog open={deleteGroupDialogOpen} setOpen={setDeleteGroupDialogOpen} conversationId={conversationId}/>
+      <RemoveGroupDialog open={leaveGroupDialogOpen} setOpen={setLeaveGroupDialogOpen} conversationId={conversationId}/>
       <Header name={name!} imageUrl={imageUrl} options={options}/>
       <Body />
       <ChatInput />
