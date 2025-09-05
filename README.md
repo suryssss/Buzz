@@ -22,26 +22,7 @@ A modern **real-time chat app** built with **Next.js**, **Convex**, **Clerk Auth
 
 ---
 
-⚙️ Getting Started
-1️⃣ Clone the repository
-git clone https://github.com/your-username/chat-app.git
-cd chat-app
 
-2️⃣ Install dependencies
-npm install
-# or
-yarn install
-
-3️⃣ Set up environment variables
-
-Create a .env.local file in the root directory and add:
-
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-CLERK_SECRET_KEY=your_clerk_secret_key
-CONVEX_DEPLOYMENT=your_convex_url
-
-4️⃣ Run Convex
-npx convex dev
 
 5️⃣ Start the development server
 npm run dev
